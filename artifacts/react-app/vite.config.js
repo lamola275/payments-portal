@@ -38,6 +38,15 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "build"),
     emptyOutDir: true,
+    sourcemap: false,
+    minify: "esbuild",
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ["react", "react-dom"],
+        },
+      },
+    },
   },
   server: {
     port,
