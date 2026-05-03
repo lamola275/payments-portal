@@ -1,13 +1,13 @@
 import { useState } from "react";
+import { useLocation } from "wouter";
+import { supabase } from "@/lib/supabase";
 
 export default function Login() {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    remember: false,
-  });
+  const [, navigate] = useLocation();
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
-  const [submitted, setSubmitted] = useState(false);
+  const [status, setStatus] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const validate = () => {
     const newErrors = {};
@@ -16,49 +16,41 @@ export default function Login() {
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = "Enter a valid email address.";
     }
-    if (!formData.password) {
-      newErrors.password = "Password is required.";
-    }
+    if (!formData.password) newErrors.password = "Password is required.";
     return newErrors;
   };
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: type === "checkbox" ? checked : value }));
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: undefined }));
+    setStatus(null);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
-    setSubmitted(true);
-  };
 
-  if (submitted) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 max-w-md w-full text-center">
-          <div className="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-          </div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Signed in successfully!</h2>
-          <p className="text-gray-500 text-sm">Welcome back, {formData.email}.</p>
-          <button
-            onClick={() => { setSubmitted(false); setFormData({ email: "", password: "", remember: false }); }}
-            className="mt-6 text-sm text-indigo-600 hover:underline"
-          >
-            Back to login
-          </button>
-        </div>
-      </div>
-    );
-  }
+    setLoading(true);
+    setStatus(null);
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email: formData.email,
+      password: formData.password,
+    });
+
+    setLoading(false);
+
+    if (error) {
+      setStatus({ type: "error", message: error.message });
+    } else {
+      navigate("/payment");
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
@@ -67,6 +59,12 @@ export default function Login() {
           <h1 className="text-2xl font-bold text-gray-900">Welcome back</h1>
           <p className="text-sm text-gray-500 mt-1">Sign in to your account to continue.</p>
         </div>
+
+        {status && (
+          <div className="mb-5 rounded-lg px-4 py-3 text-sm bg-red-50 text-red-700 border border-red-200">
+            {status.message}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} noValidate className="space-y-5">
           <div>
@@ -93,9 +91,6 @@ export default function Login() {
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                 Password
               </label>
-              <a href="/forgot-password" className="text-xs text-indigo-600 hover:underline">
-                Forgot password?
-              </a>
             </div>
             <input
               id="password"
@@ -112,25 +107,12 @@ export default function Login() {
             {errors.password && <p className="mt-1 text-xs text-red-500">{errors.password}</p>}
           </div>
 
-          <div className="flex items-center gap-2">
-            <input
-              id="remember"
-              name="remember"
-              type="checkbox"
-              checked={formData.remember}
-              onChange={handleChange}
-              className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 accent-indigo-600"
-            />
-            <label htmlFor="remember" className="text-sm text-gray-600 select-none cursor-pointer">
-              Remember me for 30 days
-            </label>
-          </div>
-
           <button
             type="submit"
-            className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 active:bg-indigo-800 transition"
+            disabled={loading}
+            className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 active:bg-indigo-800 transition disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Sign in
+            {loading ? "Signing in…" : "Sign in"}
           </button>
         </form>
 
