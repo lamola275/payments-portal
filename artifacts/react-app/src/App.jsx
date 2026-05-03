@@ -6,6 +6,7 @@ import NotFound from "@/pages/not-found";
 import Register from "@/pages/Register";
 import Login from "@/pages/Login";
 import PaymentForm from "@/pages/PaymentForm";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -46,7 +47,9 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/register" component={Register} />
       <Route path="/login" component={Login} />
-      <Route path="/payment" component={PaymentForm} />
+      <Route path="/payment">
+        {() => <ProtectedRoute component={PaymentForm} />}
+      </Route>
       <Route component={NotFound} />
     </Switch>
   );
