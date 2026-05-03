@@ -1,8 +1,9 @@
 {
-  "buildCommand": "cd artifacts/react-app && pnpm run build",
+  "buildCommand": "pnpm install --frozen-lockfile && cd artifacts/react-app && pnpm run build",
   "outputDirectory": "artifacts/react-app/build",
   "installCommand": "pnpm install --frozen-lockfile",
   "framework": null,
+  "nodeVersion": "20.x",
   "env": {
     "NODE_ENV": "production"
   },
@@ -10,3 +11,4 @@
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
+
