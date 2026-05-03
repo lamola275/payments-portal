@@ -1,8 +1,11 @@
 {
-  "buildCommand": "pnpm --filter @workspace/react-app run build",
+  "buildCommand": "cd artifacts/react-app && pnpm run build",
   "outputDirectory": "artifacts/react-app/build",
-  "installCommand": "pnpm install",
+  "installCommand": "pnpm install --frozen-lockfile",
   "framework": null,
+  "env": {
+    "NODE_ENV": "production"
+  },
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]
