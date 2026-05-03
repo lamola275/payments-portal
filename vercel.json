@@ -1,0 +1,9 @@
+{
+  "buildCommand": "pnpm --filter @workspace/react-app run build",
+  "outputDirectory": "artifacts/react-app/build",
+  "installCommand": "pnpm install",
+  "framework": null,
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
