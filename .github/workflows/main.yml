@@ -18,8 +18,13 @@ jobs:
         with:
           version: 8
 
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --ignore-workspace
 
       - name: Run build
         run: pnpm run build
