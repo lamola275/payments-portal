@@ -27,6 +27,16 @@ const replitPlugins =
 export default defineConfig({
   base: basePath,
   plugins: [react(), tailwindcss(), ...replitPlugins],
+  define: {
+    // Vercel's Supabase integration sets SUPABASE_URL / SUPABASE_ANON_KEY without
+    // the VITE_ prefix. Forward them so the client bundle can access them.
+    "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(
+      process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL
+    ),
+    "import.meta.env.VITE_SUPABASE_ANON_KEY": JSON.stringify(
+      process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY
+    ),
+  },
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "src"),
