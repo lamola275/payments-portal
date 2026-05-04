@@ -67,7 +67,7 @@ export default function Register() {
     setLoading(false);
     if (error) {
       setStatus({ type: "error", message: error.message });
-    } else if (!data.user) {
+    } else if (!data.user || data.user.identities?.length === 0) {
       setStatus({ type: "error", message: "An account with this email already exists. Please sign in instead." });
     } else {
       // Redirect to payment immediately after successful registration
