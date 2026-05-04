@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   security-check:
@@ -11,7 +14,17 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
 
       - name: Verify project structure
         run: |
@@ -28,14 +41,20 @@ jobs:
             exit 1
           fi
 
-      - name: Check source folder exists
+      - name: Check source folders exist
         run: |
-          if [ -d src ]; then
-            echo "✅ Source folder found"
+          if [ -d artifacts ] && [ -d lib ]; then
+            echo "✅ Source folders found"
           else
-            echo "❌ Source folder missing"
+            echo "❌ Source folders missing (expected artifacts/ and lib/)"
             exit 1
           fi
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm run typecheck
 
       - name: Pipeline complete
         run: |
