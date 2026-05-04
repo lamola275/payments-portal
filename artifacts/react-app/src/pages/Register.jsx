@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { supabase } from "@/lib/supabase";
 
 const RULES = {
@@ -24,6 +25,7 @@ function validateField(name, value) {
 }
 
 export default function Register() {
+  const [, navigate] = useLocation();
   const [formData, setFormData] = useState({ name: "", email: "", password: "" });
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState(null);
@@ -41,7 +43,6 @@ export default function Register() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    // Live re-validation once the field has been touched
     const err = value ? validateField(name, value) : null;
     setErrors((prev) => ({ ...prev, [name]: err }));
     setStatus(null);
@@ -67,9 +68,8 @@ export default function Register() {
     if (error) {
       setStatus({ type: "error", message: error.message });
     } else {
-      setStatus({ type: "success", message: "Account created! Check your email to confirm your address." });
-      setFormData({ name: "", email: "", password: "" });
-      setErrors({});
+      // Redirect to payment immediately after successful registration
+      navigate("/payment");
     }
   };
 
