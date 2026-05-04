@@ -58,7 +58,7 @@ export default function Register() {
     setLoading(true);
     setStatus(null);
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email: formData.email,
       password: formData.password,
       options: { data: { full_name: formData.name } },
@@ -67,6 +67,8 @@ export default function Register() {
     setLoading(false);
     if (error) {
       setStatus({ type: "error", message: error.message });
+    } else if (!data.user) {
+      setStatus({ type: "error", message: "An account with this email already exists. Please sign in instead." });
     } else {
       // Redirect to payment immediately after successful registration
       navigate("/payment");
