@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { supabase } from "@/lib/supabase";
 
 const CURRENCIES = ["USD", "EUR", "GBP", "CHF", "JPY", "CAD", "AUD", "SEK", "NOK", "DKK"];
@@ -53,6 +54,7 @@ function formatIBAN(value) {
 }
 
 export default function PaymentForm() {
+  const [, navigate] = useLocation();
   const [formData, setFormData] = useState({
     recipientName: "",
     iban: "",
@@ -135,9 +137,18 @@ export default function PaymentForm() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 w-full max-w-lg">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">New payment</h1>
-          <p className="text-sm text-gray-500 mt-1">Enter the transfer details below.</p>
+        <div className="mb-8 flex items-start justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">New payment</h1>
+            <p className="text-sm text-gray-500 mt-1">Enter the transfer details below.</p>
+          </div>
+          <button
+            type="button"
+            onClick={async () => { await supabase.auth.signOut(); navigate("/login"); }}
+            className="text-sm text-gray-500 hover:text-red-600 transition"
+          >
+            Log out
+          </button>
         </div>
 
         {status && (
